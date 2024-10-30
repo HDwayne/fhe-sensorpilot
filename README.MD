@@ -1,4 +1,4 @@
-# SensorPilot Controller Service
+# SensorPilot Controller Service (Discontinued)
 
 A Node.js application designed to control FHE Sensor Pilot V1.9 devices. This project aimed to create a Dockerized service capable of managing SensorPilot devices, receiving real-time sensor data, controlling relays, and integrating with MQTT brokers. It was designed to facilitate the integration of SensorPilot devices into home automation systems, such as Home Assistant or Node-RED.
 
@@ -18,7 +18,7 @@ Additionally, the Wi-Fi configuration protocol for SensorPilot devices requires 
 - **MQTT Integration**: Publish sensor data and device statuses to an MQTT broker for integration with other systems.
 - **Dockerized Deployment**: Run the application in a Docker container for easy setup and isolation.
 
-## Project Goals (Discontinued)
+## Project Goals
 
 The primary goal of this project was to eliminate dependency on the official FHE SensorPilot app and provide a standalone service capable of directly controlling SensorPilot devices. The aim was to build a simple solution for integrating these devices into modern home automation systems.
 
