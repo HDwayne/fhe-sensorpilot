@@ -1,0 +1,58 @@
+{
+    "0080E1BB94D3": {
+        "host": "192.168.1.129",
+        "port": 3000,
+        "pince": {
+            "1": {
+                "id": 21741,
+                "threshold": 1
+            },
+            "2": {
+                "id": 21742,
+                "threshold": 20
+            },
+            "3": {
+                "id": 21743,
+                "threshold": 150
+            },
+            "4": {
+                "id": 21744,
+                "threshold": 10
+            },
+            "5": {
+                "id": 21745,
+                "threshold": 80
+            },
+            "6": {
+                "id": 21746,
+                "threshold": 0
+            }
+        },
+        "relais": {
+            "A": {
+                "id": 21735,
+                "threshold": 1
+            },
+            "B": {
+                "id": 21736,
+                "threshold": 1
+            },
+            "C": {
+                "id": 21737,
+                "threshold": 1
+            },
+            "D": {
+                "id": 21738,
+                "threshold": 1
+            },
+            "E": {
+                "id": 21739,
+                "threshold": 1
+            },
+            "F": {
+                "id": 21740,
+                "threshold": 1
+            }
+        }
+    }
+}

@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    environment:
+      PORT: 3000
+      MQTT_URL: mqtt://127.0.0.1:1883
+      MQTT_USERNAME: user
+      MQTT_PASSWORD: pass
+      WS_URL: ws://127.0.0.1:3000

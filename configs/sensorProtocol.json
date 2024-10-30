@@ -1,0 +1,114 @@
+{
+  "orders": {
+    "read": {
+      "value": 52,
+      "commands": {
+        "oneWire": 3031,
+        "relaisState": 3032,
+        "analog": 3033,
+        "wifi": 3036,
+        "version": 3037,
+        "configuration": 3038,
+        "consigneOneWire": 3039,
+        "dateHeure": "303a",
+        "ampDataInstant": 3130,
+        "ampDataCumul": 3131,
+        "relais16DataInstant": 3230,
+        "relais16DataCumul": 3231,
+        "relais32DataInstant": 3330,
+        "relais32DataCumul": 3331,
+        "tic": 3430
+      }
+    },
+    "write": {
+      "value": 57,
+      "commands": {
+        "relaisState": 3032,
+        "resetWifi": 3034,
+        "majSensor": 3035,
+        "configuration": 3038,
+        "consigneOneWire": 3039,
+        "dateHeure": "303a",
+        "ampDataInstant": 3130,
+        "ampDataCumul": 3131,
+        "relais16DataInstant": 3230,
+        "relais16DataCumul": 3231,
+        "relais32DataInstant": 3330,
+        "relais32DataCumul": 3331
+      }
+    },
+    "period": {
+      "value": 50,
+      "commands": {
+        "none": 3030
+      }
+    }
+  },
+  "reverseOrders": {
+    "52": {
+      "text": "read",
+      "commands": {
+        "3031": "oneWire" ,
+        "3032": "relaisState" ,
+        "3033": "analog" ,
+        "3036": "wifi" ,
+        "3037": "version" ,
+        "3038": "configuration" ,
+        "3039": "consigneOneWire" ,
+        "303a": "dateHeure",
+        "3130": "ampDataInstant" ,
+        "3131": "ampDataCumul" ,
+        "3230": "relais16DataInstant" ,
+        "3231": "relais16DataCumul" ,
+        "3330": "relais32DataInstant" ,
+        "3331": "relais32DataCumul" ,
+        "3430": "tic"
+      }
+    },
+    "57": {
+      "text": "write",
+      "commands": {
+        "3032": "relaisState",
+        "3034": "resetWifi",
+        "3035": "majSensor",
+        "3038": "configuration",
+        "3039": "consigneOneWire",
+        "303a": "dateHeure",
+        "3130": "ampDataInstant",
+        "3131": "ampDataCumul",
+        "3230": "relais16DataInstant",
+        "3231": "relais16DataCumul",
+        "3330": "relais32DataInstant",
+        "3331": "relais32DataCumul"
+      }
+    },
+    "50": {
+      "text": "period",
+      "commands": {
+        "3030": "none"
+      }
+    }
+  },
+  "TIC": {
+    "tags": {
+      "ADCO": "4144434F30303030",
+      "OPTARIF": "4F50544152494630",
+      "ISOUSC": "49534F5553433030",
+      "IINST": "49494E5354303030",
+      "PTEC": "5054454330303030",
+      "ADPS": "4144505330303030",
+      "PEJP": "50454A5030303030",
+      "DEMAIN": "44454D41494E3030"
+    },
+    "reverse": {
+      "ADCO0000": "ADCO",
+      "OPTARIF0": "OPTARIF",
+      "ISOUSC00": "ISOUSC",
+      "IINST000": "IINST",
+      "PTEC0000": "PTEC",
+      "ADPS0000": "ADPS",
+      "PEJP0000": "PEJP",
+      "DEMAIN00": "DEMAIN"
+    }
+  }
+}

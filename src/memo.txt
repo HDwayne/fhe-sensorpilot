@@ -1,0 +1,364 @@
+
+
+SensorPilot.prototype.processReadCommands = function(buffer, taille) {
+    var command = buffer.slice(4, 6).toString('hex');
+    var data = buffer.slice(7, taille - 5);
+    
+    var self = this;
+    var commandText = sensorProtocol.reverseOrders[sensorProtocol.orders.read.value].commands[command];
+    
+    logger.info(`Processing read command: ${commandText}`, { moduleInfo: 'SensorPilot', addr: this.mac_address });
+
+    switch (commandText) {
+        case 'relaisState':
+            this.readRelaisStates(data.slice(1, 2).toString('hex'), data.slice(2, 3).toString('hex'));
+            break;
+        case 'version':
+            lean.decodeUnmaskedData(data, function(version) {
+                // self.emit('version', { version: version });
+                logger.info(`Sensor version: ${version}`, { moduleInfo: 'SensorPilot', addr: self.mac_address });
+            });
+            break;
+        // case 'wifi': 
+        //     lean.decryptData(data, function(infos){
+        //         // self.emit('wifi', {infos: infos});
+        //         logger.info(`Received wifi infos: ${infos}`, { moduleInfo: 'SensorPilot', addr: self.mac_address });
+        //     });
+        //     break;
+        // case 'tic':
+        //     lean.decodeUnmaskedData(data, function(ticData) {
+        //         var ticTag = sensorProtocol.TIC.reverse[ticData.slice(0, 8)] || '';
+        //         var ticValue = ticData.slice(8).replace(/\0/g, '');
+        //         // self.emit('tic', { ticTag: ticTag, ticValue: ticValue.trim() });
+        //         logger.info(`Received TIC data: ${ticTag} - ${ticValue}`, { moduleInfo: 'SensorPilot', addr: self.mac_address });
+        //     });
+        //     break;
+        // case 'oneWire':
+        //     lean.decodeUnmaskedData(data, function(oneWireData) {
+        //         // self.emit('oneWire', { data: oneWireData });
+        //         logger.info(`Received 1-Wire data: ${oneWireData}`, { moduleInfo: 'SensorPilot', addr: self.mac_address });
+        //     }
+        //     );
+        //     break;
+        // case 'analog':
+        //     lean.decodeUnmaskedData(data, function(analogData) {
+        //         // self.emit('analog', { data: analogData });
+        //         logger.info(`Received analog data: ${analogData}`, { moduleInfo: 'SensorPilot', addr: self.mac_address });
+        //     }
+        //     );
+        //     break;
+        // case 'configuration':
+        //     lean.decodeUnmaskedData(data, function(configData) {
+        //         // self.emit('configuration', { data: configData });
+        //         logger.info(`Received configuration data: ${configData}`, { moduleInfo: 'SensorPilot', addr: self.mac_address });
+        //     });
+        //     break;
+        // case 'consigneOneWire':
+        //     lean.decodeUnmaskedData(data, function(consigneData) {
+        //         // self.emit('consigneOneWire', { data: consigneData });
+        //         logger.info(`Received consigne 1-Wire data: ${consigneData}`, { moduleInfo: 'SensorPilot', addr: self.mac_address });
+        //     });
+        //     break;
+        // case 'dateHeure':
+        //     lean.decodeUnmaskedData(data, function(dateTimeData) {
+        //         // self.emit('dateHeure', { data: dateTimeData });
+        //         logger.info(`Received date and time data: ${dateTimeData}`, { moduleInfo: 'SensorPilot', addr: self.mac_address });
+        //     }
+        //     );
+        //     break;
+        // case 'ampDataInstant':
+        //     lean.decodeUnmaskedData(data, function(ampData) {
+        //         // self.emit('ampDataInstant', { data: ampData });
+        //         logger.info(`Received instant amp data: ${ampData}`, { moduleInfo: 'SensorPilot', addr: self.mac_address });
+        //     });
+        //     break;
+        // case 'ampDataCumul':
+        //     lean.decodeUnmaskedData(data, function(ampData) {
+        //         // self.emit('ampDataCumul', { data: ampData });
+        //         logger.info(`Received cumulative amp data: ${ampData}`, { moduleInfo: 'SensorPilot', addr: this.mac_address });
+        //     }
+        //     );
+        //     break;
+        // case 'relais16DataInstant':
+        //     lean.decodeUnmaskedData(data, function(relaisData) {
+        //         // self.emit('relais16DataInstant', { data: relaisData });
+        //         logger.info(`Received instant relais 16 data: ${relaisData}`, { moduleInfo: 'SensorPilot', addr: this.mac_address });
+        //     }
+        //     );
+        //     break;
+        // case 'relais16DataCumul':
+        //     lean.decodeUnmaskedData(data, function(relaisData) {
+        //         // self.emit('relais16DataCumul', { data: relaisData });
+        //         logger.info(`Received cumulative relais 16 data: ${relaisData}`, { moduleInfo: 'SensorPilot', addr: this.mac_address });
+        //     }
+        //     );
+        //     break;
+        // case 'relais32DataInstant':
+        //     lean.decodeUnmaskedData(data, function(relaisData) {
+        //         // self.emit('relais32DataInstant', { data: relaisData });
+        //         logger.info(`Received instant relais 32 data: ${relaisData}`, { moduleInfo: 'SensorPilot', addr: this.mac_address });
+        //     }
+        //     );
+        //     break;
+        // case 'relais32DataCumul':
+        //     lean.decodeUnmaskedData(data, function(relaisData) {
+        //         // self.emit('relais32DataCumul', { data: relaisData });
+        //         logger.info(`Received cumulative relais 32 data: ${relaisData}`, { moduleInfo: 'SensorPilot', addr: this.mac_address });
+        //     }
+        //     );
+        //     break;
+        default:
+            break;
+    }
+};
+
+// SensorPilot.prototype.readOneWire = function() {
+//     var self = this;
+//     lean.getBufferFromMaskedData('read', 'oneWire', '3030', function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+
+// SensorPilot.prototype.readAnalog = function() {
+//     var self = this;
+//     lean.getBufferFromMaskedData('read', 'analog', '3030', function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.readWifi = function() {
+//     var self = this;
+//     lean.getBufferFromMaskedData('read', 'wifi', '3030', function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.readConfiguration = function() {
+//     var self = this;
+//     lean.getBufferFromMaskedData('read', 'configuration', '3030', function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.readConsigneOneWire = function() {
+//     var self = this;
+//     lean.getBufferFromMaskedData('read', 'consigneOneWire', '3030', function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.readDateHeure = function() {
+//     var self = this;
+//     lean.getBufferFromMaskedData('read', 'dateHeure', '3030', function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.readAmpDataInstant = function() {
+//     var self = this;
+//     lean.getBufferFromMaskedData('read', 'ampDataInstant', '3030', function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.readAmpDataCumul = function() {
+//     var self = this;
+//     lean.getBufferFromMaskedData('read', 'ampDataCumul', '3030', function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.readRelais16DataInstant = function() {
+//     var self = this;
+//     lean.getBufferFromMaskedData('read', 'relais16DataInstant', '3030', function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.readRelais16DataCumul = function() {
+//     var self = this;
+//     lean.getBufferFromMaskedData('read', 'relais16DataCumul', '3030', function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.readRelais32DataInstant = function() {
+//     var self = this;
+//     lean.getBufferFromMaskedData('read', 'relais32DataInstant', '3030', function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.readRelais32DataCumul = function() {
+//     var self = this;
+//     lean.getBufferFromMaskedData('read', 'relais32DataCumul', '3030', function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+
+// SensorPilot.prototype.resetWifi = function() {
+//     var self = this;
+//     lean.getBufferFromMaskedData('write', 'resetWifi', '3030', function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.updateSensor = function() {
+//     var self = this;
+//     lean.getBufferFromMaskedData('write', 'majSensor', '3030', function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.writeConfiguration = function(configData) {
+//     var self = this;
+//     lean.getBufferFromMaskedData('write', 'configuration', configData, function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.writeConsigneOneWire = function(consigneData) {
+//     var self = this;
+//     lean.getBufferFromMaskedData('write', 'consigneOneWire', consigneData, function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.writeDateHeure = function(dateTimeData) {
+//     var self = this;
+//     lean.getBufferFromMaskedData('write', 'dateHeure', dateTimeData, function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.writeAmpDataInstant = function(data) {
+//     var self = this;
+//     lean.getBufferFromMaskedData('write', 'ampDataInstant', data, function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.writeAmpDataCumul = function(data) {
+//     var self = this;
+//     lean.getBufferFromMaskedData('write', 'ampDataCumul', data, function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.writeRelais16DataInstant = function(data) {
+//     var self = this;
+//     lean.getBufferFromMaskedData('write', 'relais16DataInstant', data, function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.writeRelais16DataCumul = function(data) {
+//     var self = this;
+//     lean.getBufferFromMaskedData('write', 'relais16DataCumul', data, function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.writeRelais32DataInstant = function(data) {
+//     var self = this;
+//     lean.getBufferFromMaskedData('write', 'relais32DataInstant', data, function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// SensorPilot.prototype.writeRelais32DataCumul = function(data) {
+//     var self = this;
+//     lean.getBufferFromMaskedData('write', 'relais32DataCumul', data, function(buffer) {
+//         self.writeBuffer(buffer, true);
+//     });
+// };
+
+// function handleTicData(sensor, ticTag, ticValue) {
+//     logger.info(`Received TIC data : ${ticTag} - ${ticValue}`, { sensorMac: sensor.mac_address });
+  
+//     sensor.teleinfos = sensor.teleinfos || {};
+  
+//     switch (ticTag) {
+//       case 'ADCO':
+//         if (!ticValue) return;
+//         sensor.teleinfos.meter_number = ticValue;
+//         clearInterval(sensor.pingInterval);
+//         sensor.pingInterval = null;
+  
+//         // Set up intervals for IINST and PTEC
+//         clearInterval(sensor.teleinfoConsoInterval);
+//         sensor.teleinfoConsoInterval = setInterval(() => {
+//           if (sensor) {
+//             sensor.getTICdata('IINST');
+//           } else {
+//             clearInterval(sensor.teleinfoConsoInterval);
+//           }
+//         }, 30 * 1000);
+  
+//         clearInterval(sensor.teleinfoInfosInterval);
+//         sensor.teleinfoInfosInterval = setInterval(() => {
+//           if (sensor) {
+//             sensor.getTICdata('PTEC');
+//           } else {
+//             clearInterval(sensor.teleinfoInfosInterval);
+//           }
+//         }, 5 * 60 * 1000);
+  
+//         sensor.getTICdata('OPTARIF');
+//         break;
+  
+//       case 'OPTARIF':
+//         sensor.teleinfos.subscription_type = ticValue;
+//         sensor.getTICdata('ISOUSC');
+//         break;
+  
+//       case 'ISOUSC':
+//         sensor.teleinfos.subscription_power = ticValue * 230;
+//         logger.info(`Sensor TIC infos refreshed : ${JSON.stringify(sensor.teleinfos)}`, { sensorMac: sensor.mac_address });
+//         sensor.getTICdata('PTEC');
+//         break;
+  
+//       case 'IINST':
+//         if (!ticValue) return;
+//         const consoInst = ticValue * 230;
+//         logger.info(`Sensor TIC consumption refreshed : ${consoInst}`, { sensorMac: sensor.mac_address });
+//         break;
+  
+//       case 'PTEC':
+//         logger.info(`Sensor TIC current period : ${ticValue}`, { sensorMac: sensor.mac_address });
+//         logger.info(`Sensor TIC last refresh period updated`, { sensorMac: sensor.mac_address });
+//         sensor.getTICdata('ADPS');
+//         break;
+  
+//       case 'ADPS':
+//         logger.info(`Sensor TIC last refresh power updated`, { sensorMac: sensor.mac_address });
+//         if (sensor.teleinfos.subscription_type === 'EJP.') {
+//           sensor.getTICdata('PEJP');
+//         } else if (sensor.teleinfos.subscription_type && sensor.teleinfos.subscription_type.startsWith('BBR')) {
+//           sensor.getTICdata('DEMAIN');
+//         }
+//         break;
+  
+//       case 'PEJP':
+//         logger.info(`Sensor TIC last refresh EJP updated`, { sensorMac: sensor.mac_address });
+//         break;
+  
+//       case 'DEMAIN':
+//         logger.info(`Sensor TIC tomorrow color : ${ticValue}`, { sensorMac: sensor.mac_address });
+//         logger.info(`Sensor TIC last refresh tomorrow updated`, { sensorMac: sensor.mac_address });
+//         break;
+  
+//       default:
+//         logger.warn(`UNKNOWN TIC TAG ${ticTag}`, { sensorMac: sensor.mac_address });
+//         break;
+//     }
+//   }
+
+SensorPilot.prototype.getTICdata = function(tag) {
+    var self = this;
+    lean.getBufferFromMaskedData('read', 'tic', sensorProtocol.TIC.tags[tag], function(buffer) {
+        self.writeBuffer(buffer, true);
+    });
+};

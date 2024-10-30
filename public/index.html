@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor Dashboard</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f7f7f7;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        #status {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .status-connected {
+            color: green;
+        }
+        .status-disconnected {
+            color: red;
+        }
+        #sensorTable {
+            margin: auto;
+            width: 90%;
+            border-collapse: collapse;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        #sensorTable, #sensorTable th, #sensorTable td {
+            border: 1px solid #ddd;
+        }
+        #sensorTable th, #sensorTable td {
+            padding: 12px;
+            text-align: center;
+        }
+        #sensorTable th {
+            background-color: #f4f4f4;
+        }
+        .action-btn {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        .action-btn.off {
+            background-color: #f44336;
+        }
+        .action-btn:hover {
+            opacity: 0.8;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-on {
+            background-color: green;
+        }
+        .status-off {
+            background-color: red;
+        }
+        .relay-controls {
+            margin-bottom: 10px;
+        }
+        #lastUpdate {
+            text-align: center;
+            margin-top: 20px;
+        }
+        @media (max-width: 768px) {
+            #sensorTable {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <h1>Sensor Dashboard</h1>
+    <div id="status" class="status-disconnected">WebSocket Status: Disconnected</div>
+    <table id="sensorTable">
+        <thead>
+            <tr>
+                <th>MAC Address</th>
+                <th>Status</th>
+                <th>Data</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Sensor data will be populated here -->
+        </tbody>
+    </table>
+    <div id="lastUpdate">Last Update: N/A</div>
+
+    <script>
+        const statusDiv = document.getElementById('status');
+        const lastUpdateDiv = document.getElementById('lastUpdate');
+        let lastUpdateTime = 'N/A';
+
+        fetch('/api/env')
+            .then(response => response.json())
+            .then(data => {
+                const wsUrl = data.wsUrl;
+                const socket = new WebSocket(wsUrl);
+
+                socket.onopen = function() {
+                    statusDiv.textContent = 'WebSocket Status: Connected';
+                    statusDiv.className = 'status-connected';
+                };
+
+                socket.onclose = function() {
+                    statusDiv.textContent = 'WebSocket Status: Disconnected';
+                    statusDiv.className = 'status-disconnected';
+                };
+
+                socket.onmessage = function(event) {
+                    const data = JSON.parse(event.data);
+                    console.log('WebSocket data:', data);
+                    updateSensors(data);
+                    updateLastUpdateTime();
+                };
+            })
+            .catch(error => console.error('Error fetching environment variable:', error));
+
+        function updateSensors(data) {
+            const tbody = document.querySelector('#sensorTable tbody');
+            tbody.innerHTML = '';
+            for (const mac_address in data) {
+                if (data.hasOwnProperty(mac_address)) {
+                    const relayData = data[mac_address]["relais"] || {};
+                    const sensorData = data[mac_address]["sensor"] || {};
+                    const sensorStatus = data[mac_address]["status"] || 'disconnected';
+
+                    const tr = document.createElement('tr');
+
+                    // MAC Address
+                    const macTd = document.createElement('td');
+                    macTd.textContent = mac_address;
+                    tr.appendChild(macTd);
+
+                    // Status
+                    const statusTd = document.createElement('td');
+                    const statusIndicator = document.createElement('div');
+                    statusIndicator.className = 'status-indicator ' + (sensorStatus === 'connected' ? 'status-on' : 'status-off');
+                    statusTd.appendChild(statusIndicator);
+                    statusTd.appendChild(document.createTextNode(sensorStatus.charAt(0).toUpperCase() + sensorStatus.slice(1)));
+                    tr.appendChild(statusTd);
+
+                    // Data
+                    const dataTd = document.createElement('td');
+                    dataTd.innerHTML = formatSensorData(sensorData);
+                    tr.appendChild(dataTd);
+
+                    // Actions
+                    const actionsTd = document.createElement('td');
+                    actionsTd.appendChild(createRelayControls(mac_address, relayData));
+                    tr.appendChild(actionsTd);
+
+                    tbody.appendChild(tr);
+                }
+            }
+        }
+
+        function formatSensorData(sensorData) {
+            let formatted = '<table style="width:100%;">';
+            for (const key in sensorData) {
+                if (sensorData.hasOwnProperty(key)) {
+                    formatted += `<tr><td>${key}</td><td>${sensorData[key]}</td></tr>`;
+                }
+            }
+            formatted += '</table>';
+            return formatted;
+        }
+
+        function createRelayControls(mac_address, relayData) {
+            const relayControlsDiv = document.createElement('div');
+            relayControlsDiv.className = 'relay-controls';
+
+            const relayIds = [21735, 21736, 21737, 21738, 21739, 21740];
+            relayIds.forEach(relayId => {
+                const currentState = relayData[relayId];
+
+                if (currentState === undefined) {
+                    return;
+                }
+
+                const toggleButton = document.createElement('button');
+                toggleButton.textContent = `Relay ${relayId} (${currentState})`;
+                toggleButton.className = `action-btn ${currentState === 'OFF' ? 'off' : ''}`;
+                toggleButton.onclick = () => toggleRelay(mac_address, relayId, currentState);
+
+                relayControlsDiv.appendChild(toggleButton);
+            });
+
+            return relayControlsDiv;
+        }
+
+        function toggleRelay(mac_address, relay_id, currentState) {
+            const newState = currentState === 'ON' ? 'OFF' : 'ON';
+            fetch(`/api/sensors/${mac_address}/relay/${relay_id}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ state: newState }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);
+                fetchSensors();
+            })
+            .catch(error => {
+                console.error('Error toggling relay:', error);
+            });
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            lastUpdateTime = now.toLocaleString();
+            lastUpdateDiv.textContent = `Last Update: ${lastUpdateTime}`;
+        }
+
+    </script>
+</body>
+</html>
